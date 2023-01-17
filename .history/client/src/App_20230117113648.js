@@ -70,7 +70,7 @@ function App ()
           } />
 
 
-          <Route path='/stripe/success/:hotelId' element={
+          <Route path='/stripe/success' element={
             <PrivateRoute>
               <StripeSuccess />
             </PrivateRoute>

@@ -138,7 +138,7 @@ export const stripeSessionId = async ( req, res ) =>
   //1. get hotel id from req.body
   const { hotelId } = req.body;
   //2. find the hotel based on hotel id from db
-  const item = await Hotel.findById( hotelId ).populate( "postedBy" ).exec();
+  const item = await hotel.findById( hotelId ).populate( "postedBy" ).exec();
   console.log( "item price ==>", item.price );
 
   //3. 20% charge as application fee
@@ -197,7 +197,7 @@ export const stripeSuccess = async ( req, res ) =>
     // 1 get hotel id from req.body
     const { hotelId } = req.body;
     // 2 find currently logged in user
-    const user = await User.findById( req.auth._id ).exec();
+    const user = await User.findById( req.user._id ).exec();
     // check if user has stripeSession
     if ( !user.stripeSession ) return;
     // 3 retrieve stripe session, based on session id we previously save in user db
@@ -221,10 +221,10 @@ export const stripeSuccess = async ( req, res ) =>
         let newOrder = await new Order( {
           hotel: hotelId,
           session,
-          orderedBy: auth._id,
+          orderedBy: user._id,
         } ).save();
         // 8 remove user's stripeSession
-        await User.findByIdAndUpdate( auth._id, {
+        await User.findByIdAndUpdate( user._id, {
           $set: { stripeSession: {} },
         } );
         res.json( { success: true } );
@@ -235,4 +235,3 @@ export const stripeSuccess = async ( req, res ) =>
     console.log( "STRIPE SUCCESS ERR", err );
   }
 };
-

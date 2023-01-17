@@ -11,8 +11,7 @@ import
   getAccountStatus,
   getAccountBalance,
   payoutSetting,
-  stripeSessionId,
-  stripeSuccess
+  stripeSessionId
 }
   from '../controllers/stripe';
 

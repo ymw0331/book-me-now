@@ -197,7 +197,7 @@ export const stripeSuccess = async ( req, res ) =>
     // 1 get hotel id from req.body
     const { hotelId } = req.body;
     // 2 find currently logged in user
-    const user = await User.findById( req.auth._id ).exec();
+    const user = await User.findById( req.user._id ).exec();
     // check if user has stripeSession
     if ( !user.stripeSession ) return;
     // 3 retrieve stripe session, based on session id we previously save in user db

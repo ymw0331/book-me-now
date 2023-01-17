@@ -1,0 +1,15 @@
+import Jumbotron from '../components/cards/Jumbotron';
+
+const StripeCancel = () =>
+{
+  return (
+    <Jumbotron/>
+    <div className="container">
+      <div className="col">
+        <h2 className="text-center p-5">Payment success.</h2>
+      </div>
+    </div>
+  );
+};
+
+export default StripeCancel;

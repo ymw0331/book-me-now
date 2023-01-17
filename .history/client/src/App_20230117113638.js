@@ -70,15 +70,15 @@ function App ()
           } />
 
 
-          <Route path='/stripe/success/:hotelId' element={
-            <PrivateRoute>
-              <StripeSuccess />
+          <Route path='/stripe/success' element={
+            <PrivateRoutSte>
+              <StripeCallback />
             </PrivateRoute>
           } />
 
           <Route path='/stripe/cancel' element={
             <PrivateRoute>
-              <StripeCancel />
+              <StripeCallback />
             </PrivateRoute>
           } />
         </Route>
