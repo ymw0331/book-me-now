@@ -1,7 +1,0 @@
-const ViewHotel = () =>
-{
-  return (
-
-
-    );
-};
