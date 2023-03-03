@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon -r esm server.js"
+    "start": "node -r esm server.js",
+    "dev": "nodemon -r esm server.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
