@@ -9,8 +9,8 @@ import { useDispatch } from 'react-redux';
 
 const Login = () =>
 {
-  const [ email, setEmail ] = useState( "ymw0331@gmail.com" );
-  const [ password, setPassword ] = useState( "ymw0331" );
+  const [ email, setEmail ] = useState( "" );
+  const [ password, setPassword ] = useState( "" );
   const navigate = useNavigate();
 
   const dispatch = useDispatch();

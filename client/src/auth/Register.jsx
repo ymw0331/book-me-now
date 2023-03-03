@@ -7,10 +7,10 @@ import { register } from '../actions/auth';
 
 const Register = () =>
 {
-  const [ name, setName ] = useState( "ymw0331" );
-  const [ email, setEmail ] = useState( "ymw0331@gmail.com" );
-  const [ password, setPassword ] = useState( "ymw0331" );
-  
+  const [ name, setName ] = useState( "" );
+  const [ email, setEmail ] = useState( "" );
+  const [ password, setPassword ] = useState( "" );
+
 
   const navigate = useNavigate();
 
