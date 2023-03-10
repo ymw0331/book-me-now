@@ -1,4 +1,5 @@
-## Features and hightlights
+## An online service booking to post service/products on marketplace platform, integrated with Stripe payment services.
+### Features and hightlights
 
 <ul>
 
