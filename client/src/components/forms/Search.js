@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { DatePicker, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import AlgoliaPlaces from "algolia-places-react";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from "react-places-autocomplete";
@@ -48,13 +47,6 @@ const Search = () =>
   return (
     <div className="d-flex pb-4">
       <div className="w-100">
-        {/* <AlgoliaPlaces
-          placeholder="Location"
-          defaultValue={ location }
-          options={ config }
-          onChange={ ( { suggestion } ) => setLocation( suggestion.value ) }
-          style={ { height: "50px" } }
-        /> */}
 
         <PlacesAutocomplete
           value={ location }

@@ -1,6 +1,6 @@
 export default function Jumbotron ( {
   title,
-  subTitle = "Welcome to React Hotel Booking App"
+  subTitle = "Welcome to React Services Booking Marketplace App"
 } )
 {
   return (

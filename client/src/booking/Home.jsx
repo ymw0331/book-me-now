@@ -2,7 +2,6 @@ import Jumbotron from '../components/cards/Jumbotron';
 import { allHotels } from '../actions/hotel';
 import { useState, useEffect } from 'react';
 import SmallCard from '../components/cards/SmallCard';
-import Search from "../components/forms/Search";
 
 const Home = () =>
 {
@@ -27,12 +26,12 @@ const Home = () =>
   return (
     (
       <>
-        <Jumbotron title="All Hotels" />
+        <Jumbotron title="All Services" />
 
         <div className='container-fluid'>
           <div className="col">
             <br />
-            {/* <Search /> */}
+            {/* <Search /> */ }
           </div>
           {/* <pre>{ JSON.stringify( hotels, null, 4 ) }</pre> */ }
 
