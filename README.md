@@ -14,44 +14,18 @@ You need to have Node.js and npm installed on your computer to run this project.
 2. Install the dependencies by running `npm install` in the root directory of the project
 3. In the client directory, run `npm install` to install the frontend dependencies
 4. Create a `.env` file in the root directory of the project and add your MongoDB connection string and JWT secret key as follows:
-      <ul>
-    <li>
-   PORT = 3000
+```sh
+PORT=3000
+MONGO_URI=mongo-db-connection-string
+JWT_SECRET=jwt-secret-key
+STRIPE_SECRET_KEY=stripe-secret-key>
+STRIPE_REDIRECT_URL=http://localhost:3000/stripe/callback
+STRIPE_SETTINGS_REDIRECT_URL=http://localhost:3000/dashboard/seller
+REACT_APP_GOOGLEPLACES_API_KEY=your_google_places_api_key
+STRIPE_SUCCESS_URL=http://localhost:3000/stripe/success
+STRIPE_CANCEL_URL=http://localhost:3000/stripe/cancel
+```
 
-    </li>
-    <li>
-   MONGO_URI = mongo-db-connection-string
-    
-    </li>
-    <li>
-   JWT_SECRET = jwt-secret-key
-    
-    </li>
-
-      <li>
-   STRIPE_SECRET_KEY = stripe-secret-key>
-      </li>
-      <li>
-   STRIPE_REDIRECT_URL=http://localhost:3000/stripe/callback
-
-      </li>
-
-      <li> STRIPE_SETTINGS_REDIRECT_URL=http://localhost:3000/dashboard/seller
-      </li>
-
-      <li>
-      REACT_APP_GOOGLEPLACES_API_KEY= your_google_places_api_key
-      </li>
-      <li>
-      STRIPE_SUCCESS_URL=http://localhost:3000/stripe/success
-      </li>
-      <li>
-      STRIPE_CANCEL_URL=http://localhost:3000/stripe/cancel
-      </li>
-               
-      
-      
-      </ul>
 
 ### Running
 
