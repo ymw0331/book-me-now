@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Avatar, Badge } from 'antd';
 import moment from 'moment';
 import { getAccountBalance, currencyFormatter, payoutSetting } from '../actions/stripe';
-import { SettingOutlined } from '@ant-design/icons';
+import { Settings } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-
-const { Meta } = Card;
-const { Ribbon } = Badge;
+import Avatar from './ui/Avatar';
+import { Card } from './ui/Card';
+import { Badge } from './ui/Badge';
 
 const ConnectNav = () =>
 {
@@ -47,43 +45,55 @@ const ConnectNav = () =>
 
 
   return (
-    <div className='d-flex justify-content-around'>
-      <Card>
-        <Meta
-          avatar={
-            <Avatar>
-              user.name[ 0 ]
-            </Avatar> }
-          title={ user.name }
-          description={ `Joined ${ moment( user.createdAt ).fromNow() }` }
-        />
+    <div className='flex justify-around gap-4'>
+      <Card className="flex-1">
+        <div className="flex items-center space-x-3">
+          <Avatar
+            fallback={user.name[0]}
+            size="large"
+          />
+          <div>
+            <h3 className="font-semibold text-gray-900">{user.name}</h3>
+            <p className="text-sm text-gray-500">
+              Joined {moment(user.createdAt).fromNow()}
+            </p>
+          </div>
+        </div>
       </Card>
 
-
-      { auth && auth.user
+      {auth && auth.user
         && auth.user.stripe_seller
         && auth.user.stripe_seller.charges_enabled &&
         (
           <>
-            <Ribbon text="Available" color="grey">
-              <Card className='bg-light pt-2'>
-                { balance &&
-                  balance.pending &&
-                  balance.pending.map( ( bp, i ) => (
-                    <span key={ i }>
-                      { currencyFormatter( bp ) }
-                    </span>
-                  ) ) }
-              </Card>
-            </Ribbon>
-            <Ribbon text="Payouts" color="silver">
-              <Card className='bg-light pointer pt-2'
-                onClick={ handlePayoutSettings }
-              >
-                <SettingOutlined
-                  className='h5' />
-              </Card>
-            </Ribbon>
+            <div className="relative flex-1">
+              <Badge content="Available" variant="secondary" position="top-right">
+                <Card className="bg-gray-50 h-full">
+                  <div className="pt-2">
+                    {balance &&
+                      balance.pending &&
+                      balance.pending.map((bp, i) => (
+                        <span key={i} className="block font-semibold text-gray-700">
+                          {currencyFormatter(bp)}
+                        </span>
+                      ))}
+                  </div>
+                </Card>
+              </Badge>
+            </div>
+
+            <div className="relative flex-1">
+              <Badge content="Payouts" variant="default" position="top-right">
+                <Card
+                  className="bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors h-full"
+                  onClick={handlePayoutSettings}
+                >
+                  <div className="pt-2 flex justify-center">
+                    <Settings className='w-6 h-6 text-gray-600' />
+                  </div>
+                </Card>
+              </Badge>
+            </div>
           </>
         )
       }

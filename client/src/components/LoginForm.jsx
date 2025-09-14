@@ -1,35 +1,46 @@
-const LoginForm = ( {
+import Input from './ui/Input';
+import Button from './ui/Button';
+
+const LoginForm = ({
   handleSubmit,
   email,
   setEmail,
   password,
   setPassword,
-} ) => (
-  <form onSubmit={ handleSubmit } className="mt-3">
-
-    <div className="form-group mb-3">
-      <label className="form-label">Email address:</label>
-      <input
+}) => (
+  <form onSubmit={handleSubmit} className="mt-3 space-y-4">
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Email address:
+      </label>
+      <Input
         type="email"
-        className="form-control"
         placeholder="Enter email"
-        value={ email }
-        onChange={ ( e ) => setEmail( e.target.value ) }
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
     </div>
 
-    <div className="form-group mb-3">
-      <label className="form-label">Password:</label>
-      <input
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Password:
+      </label>
+      <Input
         type="password"
-        className="form-control"
         placeholder="Enter password"
-        value={ password }
-        onChange={ ( e ) => setPassword( e.target.value ) }
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
     </div>
 
-    <button className="btn btn-primary" disabled={ !email || !password }>Submit</button>
+    <Button
+      type="submit"
+      variant="primary"
+      disabled={!email || !password}
+      className="w-full"
+    >
+      Submit
+    </Button>
   </form>
 );
 

@@ -1,9 +1,9 @@
-import { LoadingOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAccountStatus } from '../actions/stripe';
 import { updateUserInLocalStorage } from '../actions/auth';
+import Spinner from '../components/ui/Spinner';
 
 const StripeCallback = () =>
 {
@@ -42,8 +42,11 @@ const StripeCallback = () =>
   };
 
   return (
-    <div className='d-flex justify-content-center p-5'>
-      <LoadingOutlined className='display-1 p-5 text-danger' />
+    <div className='flex justify-center items-center min-h-screen'>
+      <div className="text-center">
+        <Spinner size="large" color="primary" className="mb-4" />
+        <p className="text-gray-600">Connecting your Stripe account...</p>
+      </div>
     </div>
   );
 };

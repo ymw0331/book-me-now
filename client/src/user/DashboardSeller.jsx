@@ -2,142 +2,127 @@ import DashboardNav from '../components/DashboardNav';
 import ConnectNav from '../components/ConnectNav';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { HomeOutlined } from '@ant-design/icons';
+import { Home } from 'lucide-react';
 import { createConnectAccount } from '../actions/stripe';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { sellerHotels, deleteHotel } from '../actions/hotel';
 import SmallCard from '../components/cards/SmallCard';
+import { Button } from '../components/ui/Button';
+import Spinner from '../components/ui/Spinner';
 
-const DashboardSeller = () =>
-{
-  const { auth } = useSelector( ( state ) => ( { ...state } ) );
-  const [ hotels, setHotels ] = useState( [] );
-  const [ loading, setLoading ] = useState( false );
+const DashboardSeller = () => {
+  const { auth } = useSelector((state) => ({ ...state }));
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect( () =>
-  {
+  useEffect(() => {
     loadSellersHotels();
-  }, [] );
+  }, []);
 
-  const loadSellersHotels = async () =>
-  {
-    let { data } = await sellerHotels( auth.token );
-    setHotels( data );
+  const loadSellersHotels = async () => {
+    let { data } = await sellerHotels(auth.token);
+    setHotels(data);
   };
 
-
-  const handleClick = async () =>
-  {
-    setLoading( true );
-    try
-    {
-      let res = await createConnectAccount( auth.token );
-      console.log( res ); //get login link
-      window.location.href = res.data;  //open the url link
-
-    } catch ( error )
-    {
-      console.log( error );
-      toast.error( "Stripe connect failed, Try again." );
-      setLoading( false );
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      let res = await createConnectAccount(auth.token);
+      console.log(res);
+      window.location.href = res.data;
+    } catch (error) {
+      console.log(error);
+      toast.error("Stripe connect failed, Try again.");
+      setLoading(false);
     }
   };
 
-  const handleHotelDelete = async ( hotelId ) =>
-  {
-    if ( !window.confirm( "Are you sure?" ) ) return;
-    deleteHotel( auth.token, hotelId ).then( ( res ) =>
-    {
-      toast.success( "Hotel Deleted" );
+  const handleHotelDelete = async (hotelId) => {
+    if (!window.confirm("Are you sure?")) return;
+    deleteHotel(auth.token, hotelId).then((res) => {
+      toast.success("Hotel Deleted");
       loadSellersHotels();
-    } );
+    });
   };
 
-
-
-  const connected = () =>
-  (
-    <div className='container-fluid '>
-      <div className='row'>
-
-        <div className='col-md-10'>
-          <h2>Your Hotels</h2>
+  const connected = () => (
+    <div className='w-full px-4'>
+      <div className='flex flex-wrap items-center justify-between mb-6'>
+        <div className='flex-1'>
+          <h2 className='text-2xl font-bold text-gray-900'>Your Hotels</h2>
         </div>
-
-        <div className='col-md-2'>
-          <Link
-            to="/hotels/new"
-            className='btn btn-primary '>
-            + Add New
+        <div>
+          <Link to="/hotels/new">
+            <Button variant="primary">
+              + Add New
+            </Button>
           </Link>
         </div>
-
       </div>
-      <div className='row'>
-        {/* <pre>{ JSON.stringify( hotels, null, 4 ) }</pre> */ }
 
-        { hotels.map( h =>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+        {hotels.map(h => (
           <SmallCard
-            key={ h._id }
-            h={ h }
-            showMoreViewButton={ false }
-            owner={ true }
-            handleHotelDelete={ handleHotelDelete }
-          /> ) }
-
-      </div>
-
-    </div>
-  );
-
-  const notConnected = () =>
-  (
-    <div className='container-fluid '>
-      <div className='row '>
-        <div className='col-md-6 offset-md-3 text-center'>
-          <HomeOutlined className="h1" />
-          <h4>Setup payout to post hotel rooms</h4>
-          <p className="lead">
-            WayneHotelPlatform partners with stripe to transfer earnings to your bank accounts
-          </p>
-          <button
-            disabled={ loading }
-            onClick={ handleClick }
-            className='btn btn-primary mb-3'>
-            { loading ? "Processing..." : "Setup Payouts" }
-          </button>
-
-          <p className='text-muted'>
-            <small>
-              You'll be redirected to Stripe to complete the onboarding process.
-            </small>
-          </p>
-        </div>
-
+            key={h._id}
+            h={h}
+            showViewMoreButton={false}
+            owner={true}
+            handleHotelDelete={handleHotelDelete}
+          />
+        ))}
       </div>
     </div>
   );
 
+  const notConnected = () => (
+    <div className='w-full px-4'>
+      <div className='flex flex-col items-center justify-center py-12'>
+        <Home className='w-16 h-16 text-gray-400 mb-4' />
+        <h2 className='text-2xl font-bold text-gray-900 mb-2'>
+          Setup payouts to post hotel rooms
+        </h2>
+        <p className='text-gray-600 mb-6 text-center max-w-md'>
+          MERN partners with stripe to transfer earnings to your bank account
+        </p>
+        <Button
+          onClick={handleClick}
+          variant="primary"
+          size="large"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <Spinner size="small" color="white" className="mr-2" />
+              Processing...
+            </>
+          ) : (
+            'Setup Payouts'
+          )}
+        </Button>
+        <p className='text-sm text-gray-500 mt-4'>
+          You'll be redirected to Stripe to complete the onboarding process.
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <div className='container-fluid jumbotron p-5 jumbotron'>
+      <div className='w-full jumbotron p-8'>
         <ConnectNav />
       </div>
-      <div className='container-fluid p-4'>
+
+      <div className='w-full px-4 py-4'>
         <DashboardNav />
       </div>
 
-      { auth &&
+      {auth &&
         auth.user &&
         auth.user.stripe_seller &&
         auth.user.stripe_seller.charges_enabled
-        ? connected() : notConnected()
-      }
-
-      {/* <pre>{ JSON.stringify( auth, null, 4 ) }</pre> */ }
-
+        ? connected()
+        : notConnected()}
     </>
   );
 };

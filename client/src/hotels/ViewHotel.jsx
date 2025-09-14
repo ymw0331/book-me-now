@@ -1,5 +1,7 @@
 import Jumbotron from '../components/cards/Jumbotron';
 import React, { useState, useEffect } from "react";
+import { Button } from '../components/ui/Button';
+import Alert from '../components/ui/Alert';
 import { useStore } from "react-redux";
 import { read, diffDays, isAlreadyBooked } from "../actions/hotel";
 import moment from "moment";
@@ -78,19 +80,21 @@ const ViewHotel = () =>
         title={ `${ hotel.title }` }
 
       />
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-6">
+      <div className="max-w-full px-4">
+        <div className="flex flex-wrap -mx-2">
+          <div className="w-full md:w-1/2 px-2">
             <br />
-            <img src={ image } alt={ hotel.title } className="img img-fluid m-2" />
+            <img src={ image } alt={ hotel.title } className="max-w-full h-auto rounded-lg shadow-md m-2" />
           </div>
 
-          <div className="col-md-6">
+          <div className="w-full md:w-1/2 px-2">
             <br />
             <b>{ hotel.content }</b>
-            <p className="alert alert-info mt-3">${ hotel.price }</p>
-            <p className="card-text">
-              <span className="float-right text-primary">
+            <Alert variant="info" className="mt-3">
+              ${ hotel.price }
+            </Alert>
+            <p className="text-gray-700">
+              <span className="float-end text-blue-600">
                 for { diffDays( hotel.from, hotel.to ) }{ " " }
                 { diffDays( hotel.from, hotel.to ) <= 1 ? " day" : " days" }
               </span>
@@ -105,19 +109,19 @@ const ViewHotel = () =>
             </p>
             <i>Posted by { hotel.postedBy && hotel.postedBy.name }</i>
             <br />
-            <button
+            <Button
               onClick={ handleClick }
-              className="btn btn-block btn-lg btn-primary mt-3"
-              disabled={ loading || alreadyBooked }
+              size="lg"
+              className="w-full mt-3"
+              disabled={ alreadyBooked }
+              loading={ loading }
             >
-              { loading
-                ? "Loading..."
-                : alreadyBooked
-                  ? "Already Booked"
-                  : auth && auth.token
-                    ? "Book Now"
-                    : "Login to Book" }
-            </button>
+              { alreadyBooked
+                ? "Already Booked"
+                : auth && auth.token
+                  ? "Book Now"
+                  : "Login to Book" }
+            </Button>
           </div>
         </div>
       </div>

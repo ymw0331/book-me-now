@@ -1,12 +1,11 @@
 import PlacesAutocomplete from "react-places-autocomplete";
-import { DatePicker, Select } from "antd";
 import moment from "moment";
+import DatePicker from '../ui/DatePicker';
+import Select from '../ui/Select';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
 
-
-const { Option } = Select;
-
-
-const HotelEditForm = ( {
+const HotelEditForm = ({
   values,
   setValues,
   handleChange,
@@ -15,139 +14,140 @@ const HotelEditForm = ( {
   setLocation,
   location,
   handleLocationSelect
-} ) =>
-{
+}) => {
   const { title, content, price, bed, from, to } = values;
 
+  const bedOptions = [
+    { value: 1, label: '1 Bed' },
+    { value: 2, label: '2 Beds' },
+    { value: 3, label: '3 Beds' },
+    { value: 4, label: '4 Beds' },
+  ];
+
   return (
-    <form onSubmit={ handleSubmit }>
-      <div className="form-group">
-        <label className="btn btn-outline-secondary btn-block m-2 text-left">
-          Image
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="flex items-center justify-center w-full px-4 py-2 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-gray-400 transition-colors">
+          <span className="text-gray-600">Click to upload new image</span>
           <input
             type="file"
             name="image"
-            onChange={ handleImageChange }
+            onChange={handleImageChange}
             accept="image/*"
             hidden
           />
         </label>
-
-        <input
-          type="text"
-          name="title"
-          onChange={ handleChange }
-          placeholder="Title"
-          className="form-control m-2"
-          value={ title }
-        />
-
-        <textarea
-          name="content"
-          onChange={ handleChange }
-          placeholder="Content"
-          className="form-control m-2"
-          value={ content }
-        />
-
-
-        {/* <AlgoliaPlaces
-          className="form-control m-2"
-          placeholder="Location"
-          defaultValue={ location }
-          options={ config }
-          onChange={ ( { suggestion } ) =>
-            setValues( { ...values, location: suggestion.value } )
-          }
-          style={ { height: "50px" } }
-        /> */}
-
-
-        <PlacesAutocomplete
-          className="form-control m-2"
-          value={ location }
-          onChange={ setLocation }
-          onSelect={ handleLocationSelect }
-        >
-          { ( { getInputProps, suggestions, getSuggestionItemProps, loading } ) => (
-            <div>
-
-              <input
-                className="form-control m-2"
-                { ...getInputProps( { placeholder: 'Location' } ) } />
-              <p
-                className="form-control m-2"
-              >
-                { loading ? <div>...loading</div> : null }
-                {
-                  suggestions.map( suggestion =>
-                  {
-                    const style = {
-                      backgroundColor: suggestion.active ? "#abdbe3" : "#fff"
-                    };
-                    return (
-                      <div { ...getSuggestionItemProps( suggestion, { style } ) }>
-                        { suggestion.description }
-                      </div>
-                    );
-                  } )
-                }
-              </p>
-
-            </div>
-          ) }
-        </PlacesAutocomplete>
-
-        <input
-          type="number"
-          name="price"
-          onChange={ handleChange }
-          placeholder="Price"
-          className="form-control m-2"
-          value={ price }
-        />
-
-        <Select
-          onChange={ ( value ) => setValues( { ...values, bed: value } ) }
-          className="w-100 m-2"
-          size="large"
-          placeholder="Number of beds"
-          value={ bed }
-        >
-          <Option key={ 1 }>{ 1 }</Option>
-          <Option key={ 2 }>{ 2 }</Option>
-          <Option key={ 3 }>{ 3 }</Option>
-          <Option key={ 4 }>{ 4 }</Option>
-        </Select>
       </div>
 
-      { from && (
+      <div>
+        <Input
+          type="text"
+          name="title"
+          onChange={handleChange}
+          placeholder="Title"
+          value={title}
+        />
+      </div>
+
+      <div>
+        <textarea
+          name="content"
+          onChange={handleChange}
+          placeholder="Content"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          rows="4"
+          value={content}
+        />
+      </div>
+
+      <div>
+        <PlacesAutocomplete
+          value={location}
+          onChange={setLocation}
+          onSelect={handleLocationSelect}
+        >
+          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+            <div className="relative">
+              <input
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                {...getInputProps({ placeholder: "Location" })}
+              />
+              {suggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                  {loading && (
+                    <div className="px-3 py-2 text-sm text-gray-500">Loading...</div>
+                  )}
+                  {suggestions.map((suggestion, index) => {
+                    const className = suggestion.active
+                      ? "px-3 py-2 cursor-pointer bg-blue-50 hover:bg-blue-100"
+                      : "px-3 py-2 cursor-pointer hover:bg-gray-50";
+                    return (
+                      <div
+                        key={index}
+                        {...getSuggestionItemProps(suggestion, { className })}
+                      >
+                        {suggestion.description}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </PlacesAutocomplete>
+      </div>
+
+      <div>
+        <Input
+          type="number"
+          name="price"
+          onChange={handleChange}
+          placeholder="Price per night"
+          value={price}
+        />
+      </div>
+
+      <div>
+        <Select
+          value={bed}
+          onChange={(value) => setValues({ ...values, bed: value })}
+          options={bedOptions}
+          placeholder="Number of beds"
+          size="large"
+        />
+      </div>
+
+      <div>
         <DatePicker
-          defaultValue={ moment( from, "YYYY-MM-DD" ) }
           placeholder="From date"
-          className="form-control m-2"
-    
-          disabledDate={ ( current ) =>
-            current && current.valueOf() < moment().subtract( 1, "days" )
+          value={from ? new Date(from) : null}
+          onChange={(date) =>
+            setValues({ ...values, from: date ? date.toISOString().split('T')[0] : '' })
           }
+          minDate={new Date()}
         />
-      ) }
+      </div>
 
-      { to && (
+      <div>
         <DatePicker
-          defaultValue={ moment( to, "YYYY-MM-DD" ) }
           placeholder="To date"
-          className="form-control m-2"
-          onChange={ ( date, dateString ) =>
-            setValues( { ...values, to: dateString } )
+          value={to ? new Date(to) : null}
+          onChange={(date) =>
+            setValues({ ...values, to: date ? date.toISOString().split('T')[0] : '' })
           }
-          disabledDate={ ( current ) =>
-            current && current.valueOf() < moment().subtract( 1, "days" )
-          }
+          minDate={from ? new Date(from) : new Date()}
         />
-      ) }
+      </div>
 
-      <button className="btn btn-outline-primary m-2">Save</button>
+      <div>
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full"
+        >
+          Update Hotel
+        </Button>
+      </div>
     </form>
   );
 };

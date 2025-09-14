@@ -1,4 +1,7 @@
-const RegisterForm = ( {
+import Input from './ui/Input';
+import Button from './ui/Button';
+
+const RegisterForm = ({
   handleSubmit,
   name,
   setName,
@@ -6,42 +9,52 @@ const RegisterForm = ( {
   setEmail,
   password,
   setPassword,
-} ) => (
-  <form onSubmit={ handleSubmit } className="mt-3">
-    <div className="form-group mb-3">
-      <label className="form-label">Name:</label>
-      <input
+}) => (
+  <form onSubmit={handleSubmit} className="mt-3 space-y-4">
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Name:
+      </label>
+      <Input
         type="text"
-        className="form-control"
         placeholder="Enter name"
-        value={ name }
-        onChange={ ( e ) => setName( e.target.value ) }
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
     </div>
 
-    <div className="form-group mb-3">
-      <label className="form-label">Email address:</label>
-      <input
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Email address:
+      </label>
+      <Input
         type="email"
-        className="form-control"
         placeholder="Enter email"
-        value={ email }
-        onChange={ ( e ) => setEmail( e.target.value ) }
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
     </div>
 
-    <div className="form-group mb-3">
-      <label className="form-label">Password:</label>
-      <input
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Password:
+      </label>
+      <Input
         type="password"
-        className="form-control"
         placeholder="Enter password"
-        value={ password }
-        onChange={ ( e ) => setPassword( e.target.value ) }
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
     </div>
 
-    <button className="btn btn-primary" disabled={ !name || !email || !password }>Submit</button>
+    <Button
+      type="submit"
+      variant="primary"
+      disabled={!name || !email || !password}
+      className="w-full"
+    >
+      Submit
+    </Button>
   </form>
 );
 

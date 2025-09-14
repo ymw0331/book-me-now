@@ -28,12 +28,12 @@ const SearchResult = () =>
   return (
     <>
       <Jumbotron title={ "Search Result" } />
-      <div className="col">
+      <div className="w-full px-4">
         <br />
         <Search />
       </div>
-      <div className="container">
-        <div className="row">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex flex-wrap -mx-2">
           { hotels.map( ( h ) => (
             <SmallCard key={ h._id } h={ h } />
           ) ) }

@@ -113,9 +113,9 @@ const EditHotel = () =>
         subTitle={ `Hotel: ${ title }` }
       />
 
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-10">
+      <div className="max-w-full px-4">
+        <div className="flex flex-wrap -mx-2">
+          <div className="w-full md:w-5/6 px-2">
             <br />
             {/* { hotelForm() } */ }
 
@@ -131,11 +131,11 @@ const EditHotel = () =>
             />
 
           </div>
-          <div className="col-md-2">
+          <div className="w-full md:w-1/6 px-2">
             <img
               src={ preview }
               alt="preview_image"
-              className="img img-fluid m-2"
+              className="max-w-full h-auto rounded-lg shadow-md m-2"
             />
             <pre>{ JSON.stringify( values, null, 4 ) }</pre>
             {/* { JSON.stringify( location ) } */ }
