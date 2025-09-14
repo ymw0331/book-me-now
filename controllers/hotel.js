@@ -1,6 +1,6 @@
 import fs from 'fs';
-import Hotel from '../models/hotel';
-import Order from '../models/order';
+import Hotel from '../models/hotel.js';
+import Order from '../models/order.js';
 
 export const create = async ( req, res ) =>
 {
@@ -184,3 +184,4 @@ export const searchListings = async ( req, res ) =>
 //   location,
 //   bed,
 // } );
+

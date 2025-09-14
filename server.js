@@ -1,11 +1,12 @@
 
 import express from 'express';
 import mongoose from 'mongoose';
-import { readdirSync } from "fs";
+import { readdirSync } from 'fs';
 import cors from 'cors';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
 
-require( "dotenv" ).config();
-const morgan = require( "morgan" );
+dotenv.config();
 const app = express();
 
 mongoose.set( 'strictQuery', true );
@@ -22,7 +23,11 @@ app.use( morgan( "dev" ) );
 app.use( express.json() );
 
 //router middleware
-readdirSync( './routes' ).map( ( r ) => app.use( '/api', require( `./routes/${ r }` ) ) ); //make all routes as middleware
+const routeFiles = readdirSync('./routes');
+for (const file of routeFiles) {
+  const route = await import(`./routes/${file}`);
+  app.use('/api', route.default);
+}
 
 const port = process.env.PORT || 8000;
 

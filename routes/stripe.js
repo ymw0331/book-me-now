@@ -1,20 +1,18 @@
-import express from "express";
+import express from 'express';
 
 const router = express.Router();
 
-import { requireSignin } from "../middlewares/index";
+import { requireSignin } from '../middlewares/index.js';
 
 //controllers
-import
-{
+import {
   createConnectAccount,
   getAccountStatus,
   getAccountBalance,
   payoutSetting,
   stripeSessionId,
   stripeSuccess
-}
-  from '../controllers/stripe';
+} from '../controllers/stripe.js';
 
 router.post( '/create-connect-account', requireSignin, createConnectAccount );
 router.post( '/get-account-status', requireSignin, getAccountStatus );
@@ -25,5 +23,4 @@ router.post( '/stripe-session-id', requireSignin, stripeSessionId );
 // order
 router.post( "/stripe-success", requireSignin, stripeSuccess );
 
-// export default router;
-module.exports = router;
+export default router;
