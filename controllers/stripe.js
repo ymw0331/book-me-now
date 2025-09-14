@@ -1,12 +1,13 @@
-import User from "../models/user";
+import User from "../models/user.js";
 import queryString from "query-string";
-import Hotel from '../models/hotel';
-import Order from '../models/order';
+import Hotel from '../models/hotel.js';
+import Order from '../models/order.js';
 
 // const stripe = require( 'stripe' )( process.env.STRIPE_SECRET );
 
 // const stripe = require( 'stripe' )( process.env.STRIPE_TEST_SECRET );
-const stripe = require( 'stripe' )( process.env.STRIPE_SECRET_SG );
+import Stripe from 'stripe';
+const stripe = new Stripe( process.env.STRIPE_SECRET_SG );
 
 
 export const createConnectAccount = async ( req, res ) =>
