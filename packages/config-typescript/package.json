@@ -1,0 +1,10 @@
+{
+  "name": "@book-me-now/config-typescript",
+  "version": "0.0.0",
+  "main": "index.js",
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ]
+}

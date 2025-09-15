@@ -1,11 +1,15 @@
 {
   "name": "book-me-now",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "dev:web": "turbo dev --filter=@book-me-now/web",
-    "dev:legacy": "node server.js",
+    "dev:legacy": "node 00-legacy-mern/server.js",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean"
@@ -15,7 +19,7 @@
     "turbo": "^1.10.0",
     "typescript": "^5.0.0"
   },
-  "packageManager": "pnpm@8.0.0",
+  "packageManager": "npm@10.0.0",
   "engines": {
     "node": ">=18"
   }

@@ -1,0 +1,34 @@
+{
+  "name": "@book-me-now/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@book-me-now/ui": "*",
+    "@book-me-now/utils": "*",
+    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/vite": "^4.0.0",
+    "autoprefixer": "^10.4.21",
+    "next": "15.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@book-me-now/config-tailwind": "*",
+    "@book-me-now/config-typescript": "*",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.0",
+    "postcss": "^8",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5"
+  }
+}
