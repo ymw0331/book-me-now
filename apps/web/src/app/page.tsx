@@ -1,36 +1,21 @@
 import Link from 'next/link'
-import { 
-  Container, 
-  Jumbotron, 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle,
-  Badge, 
-  Button, 
-  Input 
+import {
+  Container,
+  Jumbotron,
+  PropertyCard,
+  SearchBar,
+  Button
 } from '@book-me-now/ui'
-import { MapPin, Star, Calendar, Users } from 'lucide-react'
+import { Home, Briefcase, Globe, Shield } from 'lucide-react'
 
-/**
- * Hotel Homepage - Server Component
- * 
- * This is a SERVER COMPONENT that runs on the server!
- * Benefits:
- * - No loading states needed (data fetched during render)
- * - Perfect SEO (content rendered server-side)
- * - Fast performance (no client-server round trips)
- * - Zero JavaScript sent to client for static content
- */
 export default async function HomePage() {
-  // This runs on the SERVER during build/request time
-  // Later this will fetch from DynamoDB, but for now we'll use mock data
-  const featuredHotels = await getFeaturedHotels()
+  const featuredProperties = await getFeaturedProperties()
   const stats = await getStats()
+  const categories = await getCategories()
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <Jumbotron variant="gradient">
         <div className="space-y-6">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -40,30 +25,17 @@ export default async function HomePage() {
             Discover amazing hotels worldwide. From boutique properties to luxury resorts.
             Book with confidence and create unforgettable memories.
           </p>
-          
-          {/* Search Form */}
+
+          {/* Integrated Search Bar */}
           <div className="mt-12 max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <div className="lg:col-span-2">
-                  <Input
-                    placeholder="Where do you want to go?"
-                    className="h-12 text-gray-900 placeholder:text-gray-500"
-                  />
-                </div>
-                <div>
-                  <Input
-                    type="date"
-                    className="h-12 text-gray-900"
-                  />
-                </div>
-                <div>
-                  <Button size="lg" className="w-full h-12">
-                    Search Hotels
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <SearchBar
+              variant="expanded"
+              value={{
+                location: '',
+                guests: 1,
+                bedrooms: 1
+              }}
+            />
           </div>
         </div>
       </Jumbotron>
@@ -90,10 +62,37 @@ export default async function HomePage() {
         </div>
       </Container>
 
-      {/* Featured Hotels Section */}
-      <div className="bg-gray-50 py-16">
+      {/* Category Filters */}
+      <div className="bg-gray-50 py-12">
         <Container>
-          <div className="text-center mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Explore by property type</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/search?type=${category.slug}`}
+                className="group"
+              >
+                <div className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 text-blue-600">
+                    {category.icon}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {category.count} properties
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </div>
+
+      {/* Featured Properties Section */}
+      <Container className="py-16">
+        <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Featured Properties
           </h2>
@@ -103,67 +102,119 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredHotels.map((hotel) => (
-            <Card key={hotel.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <div className="aspect-[4/3] bg-gray-200">
-                <img
-                  src={hotel.image}
-                  alt={hotel.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <CardHeader>
-                <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-lg">{hotel.title}</CardTitle>
-                  <div className="text-right">
-                    <div className="text-xl font-bold text-blue-600">
-                      ${hotel.price}
-                    </div>
-                    <div className="text-sm text-gray-500">per night</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <Badge variant="secondary">{hotel.location}</Badge>
-                </div>
-                <div className="flex items-center gap-1 mb-3">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium">{hotel.rating}</span>
-                  <span className="text-sm text-gray-500">({hotel.reviews} reviews)</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {hotel.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{hotel.maxGuests} guests</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>Available</span>
-                    </div>
-                  </div>
-                  <Button asChild size="sm">
-                    <Link href={`/hotels/${hotel.id}`}>
-                      View Details
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          {featuredProperties.map((property) => (
+            <PropertyCard
+              key={property.id}
+              property={{
+                _id: property.id,
+                title: property.title,
+                location: property.location,
+                price: property.price,
+                content: `Stunning ${property.title} in ${property.location}`,
+                bed: 2,
+                from: new Date().toISOString().split('T')[0],
+                rating: property.rating,
+                reviewCount: property.reviews,
+                isSuperhostProperty: property.isSuperhost,
+                isFavorited: property.isFavorite,
+                image: { contentType: 'image/jpeg' }
+              }}
+            />
           ))}
         </div>
 
-          <div className="text-center mt-12">
-            <Button asChild size="lg">
-              <Link href="/hotels">
-                Explore All Hotels
-              </Link>
-            </Button>
+        <div className="text-center mt-12">
+          <Button asChild size="lg">
+            <Link href="/properties">
+              Explore All Properties
+            </Link>
+          </Button>
+        </div>
+      </Container>
+
+      {/* Live Anywhere Section */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16">
+        <Container>
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+            Live anywhere
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white">
+                <Home className="w-10 h-10" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Entire homes</h3>
+              <p className="text-gray-600">Comfortable private places, with room for friends or family.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white">
+                <Globe className="w-10 h-10" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Unique stays</h3>
+              <p className="text-gray-600">Spaces that are more than just a place to sleep.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center text-white">
+                <Briefcase className="w-10 h-10" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Business travel</h3>
+              <p className="text-gray-600">Work-friendly stays with fast wifi and dedicated workspaces.</p>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      {/* Trust Indicators */}
+      <Container className="py-16">
+        <div className="bg-gray-50 rounded-2xl p-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Why book with us?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <Shield className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-lg font-semibold mb-2">Secure Booking</h3>
+              <p className="text-gray-600">Your payment information is encrypted and secure</p>
+            </div>
+            <div className="text-center">
+              <Globe className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-lg font-semibold mb-2">24/7 Support</h3>
+              <p className="text-gray-600">Round-the-clock assistance for all your travel needs</p>
+            </div>
+            <div className="text-center">
+              <Home className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-lg font-semibold mb-2">Verified Properties</h3>
+              <p className="text-gray-600">All properties are verified for quality and authenticity</p>
+            </div>
+          </div>
+        </div>
+      </Container>
+
+      {/* Newsletter Section */}
+      <div className="bg-blue-600 py-16">
+        <Container>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Get exclusive deals
+            </h2>
+            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+              Subscribe to our newsletter and be the first to know about special offers and new properties
+            </p>
+            <form className="max-w-md mx-auto flex gap-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50"
+              >
+                Subscribe
+              </Button>
+            </form>
           </div>
         </Container>
       </div>
@@ -171,25 +222,9 @@ export default async function HomePage() {
   )
 }
 
-/**
- * Mock data function - simulates database call
- * 
- * In production, this would:
- * - Connect to DynamoDB
- * - Use proper caching with Next.js
- * - Handle errors gracefully
- * - Include proper TypeScript interfaces
- * 
- * Benefits of Server Components:
- * - This function runs on the server
- * - No API route needed
- * - No loading states in UI
- * - Perfect for SEO
- */
-async function getFeaturedHotels() {
-  // Simulate API delay
+async function getFeaturedProperties() {
   await new Promise(resolve => setTimeout(resolve, 100))
-  
+
   return [
     {
       id: '1',
@@ -198,9 +233,9 @@ async function getFeaturedHotels() {
       price: 299,
       rating: 4.8,
       reviews: 1247,
-      maxGuests: 4,
       image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3&w=800&q=80',
-      description: 'Experience luxury at its finest with stunning marina views, world-class amenities, and exceptional service in the heart of Singapore.'
+      isSuperhost: true,
+      isFavorite: false
     },
     {
       id: '2',
@@ -209,9 +244,9 @@ async function getFeaturedHotels() {
       price: 189,
       rating: 4.6,
       reviews: 892,
-      maxGuests: 6,
       image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&w=800&q=80',
-      description: 'Tropical paradise with pristine beaches, infinity pools, and authentic Indonesian culture. Perfect for romantic getaways and family vacations.'
+      isSuperhost: false,
+      isFavorite: true
     },
     {
       id: '3',
@@ -220,17 +255,46 @@ async function getFeaturedHotels() {
       price: 245,
       rating: 4.9,
       reviews: 634,
-      maxGuests: 2,
       image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&w=800&q=80',
-      description: 'Traditional Japanese hospitality meets modern comfort. Serene mountain views, zen gardens, and authentic kaiseki dining experiences.'
+      isSuperhost: true,
+      isFavorite: false
+    },
+    {
+      id: '4',
+      title: 'Urban Boutique Hotel',
+      location: 'New York, USA',
+      price: 325,
+      rating: 4.7,
+      reviews: 1523,
+      image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&w=800&q=80',
+      isSuperhost: false,
+      isFavorite: false
+    },
+    {
+      id: '5',
+      title: 'Coastal Paradise Villa',
+      location: 'Santorini, Greece',
+      price: 410,
+      rating: 4.9,
+      reviews: 428,
+      image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&w=800&q=80',
+      isSuperhost: true,
+      isFavorite: true
+    },
+    {
+      id: '6',
+      title: 'Desert Oasis Resort',
+      location: 'Dubai, UAE',
+      price: 550,
+      rating: 4.8,
+      reviews: 967,
+      image: 'https://images.unsplash.com/photo-1606046604972-77cc76aee944?ixlib=rb-4.0.3&w=800&q=80',
+      isSuperhost: true,
+      isFavorite: false
     }
   ]
 }
 
-/**
- * Mock stats function
- * Later this would aggregate real data from your booking database
- */
 async function getStats() {
   return {
     hotels: 15420,
@@ -238,4 +302,37 @@ async function getStats() {
     bookings: 89430,
     countries: 94
   }
+}
+
+async function getCategories() {
+  return [
+    {
+      id: 'entire-home',
+      name: 'Entire homes',
+      slug: 'entire-home',
+      count: 5234,
+      icon: <Home className="w-full h-full" />
+    },
+    {
+      id: 'private-room',
+      name: 'Private rooms',
+      slug: 'private-room',
+      count: 3421,
+      icon: <Briefcase className="w-full h-full" />
+    },
+    {
+      id: 'boutique',
+      name: 'Boutique hotels',
+      slug: 'boutique',
+      count: 2156,
+      icon: <Globe className="w-full h-full" />
+    },
+    {
+      id: 'luxury',
+      name: 'Luxury stays',
+      slug: 'luxury',
+      count: 1893,
+      icon: <Shield className="w-full h-full" />
+    }
+  ]
 }

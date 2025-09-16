@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { Heart, MapPin, Star, Users, Bed, Calendar } from "lucide-react"
 import { cn } from "@book-me-now/utils"
