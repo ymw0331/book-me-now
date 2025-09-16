@@ -6,6 +6,11 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "dependencies": {
+    "@book-me-now/utils": "*",
+    "class-variance-authority": "^0.7.0",
+    "lucide-react": "^0.424.0"
+  },
   "devDependencies": {
     "@book-me-now/config-typescript": "*",
     "typescript": "^5.0.0"

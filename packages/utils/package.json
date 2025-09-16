@@ -6,6 +6,10 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0"
+  },
   "devDependencies": {
     "@book-me-now/config-typescript": "*",
     "typescript": "^5.0.0"
