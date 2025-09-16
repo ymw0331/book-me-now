@@ -1,24 +1,360 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* ============================================
+   CSS Variables for Design Tokens
+   ============================================ */
 :root {
+  /* Base colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #222222;
+
+  /* Booking platform colors */
+  --booking-primary: #003580;
+  --booking-primary-light: #0050a0;
+  --booking-accent: #FF385C;
+  --booking-accent-dark: #E61E4D;
+  --booking-success: #00A699;
+  --booking-success-light: #00d4aa;
+  --booking-gold: #FFB400;
+
+  /* Typography */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: system-ui, -apple-system, sans-serif;
+
+  /* Spacing */
+  --section-spacing: 6rem;
+  --card-padding: 1.5rem;
+  --container-padding: 1rem;
+
+  /* Border radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
+/* Dark mode variables */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --booking-primary: #4d7fff;
+    --booking-primary-light: #6b8fff;
+    --booking-accent: #ff5a7e;
+    --booking-accent-dark: #ff7591;
+    --booking-success: #00c4b4;
+    --booking-gold: #ffc933;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+/* ============================================
+   Base Styles
+   ============================================ */
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Focus styles for accessibility */
+  :focus-visible {
+    outline: 2px solid var(--booking-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================
+   Utility Classes for Consistency
+   ============================================ */
+@layer components {
+  /* Layout utilities */
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .container-width {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card styles */
+  .card-base {
+    @apply bg-white rounded-xl shadow-card hover:shadow-card-hover transition-shadow duration-200;
+  }
+
+  .card-interactive {
+    @apply card-base cursor-pointer transform hover:scale-[1.02] transition-all duration-200;
+  }
+
+  /* Gradient utilities */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600;
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--booking-accent) 0%, var(--booking-accent-dark) 100%);
+  }
+
+  .gradient-booking {
+    background: linear-gradient(135deg, var(--booking-primary) 0%, var(--booking-primary-light) 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, var(--booking-success) 0%, var(--booking-success-light) 100%);
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, var(--booking-gold) 0%, #FFC933 100%);
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-gray-900/80 backdrop-blur-md border border-gray-700/50;
+  }
+
+  /* Interactive elements (for accessibility) */
+  .btn-interactive {
+    @apply min-h-[48px] min-w-[48px] inline-flex items-center justify-center;
+  }
+
+  .interactive-element {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+  }
+
+  /* Aspect ratios for images */
+  .aspect-property {
+    @apply aspect-[16/9];
+  }
+
+  .aspect-property-thumb {
+    @apply aspect-[4/3];
+  }
+
+  .aspect-avatar {
+    @apply aspect-square;
+  }
+
+  /* Overlay utilities */
+  .overlay-dark {
+    @apply absolute inset-0 bg-black/50;
+  }
+
+  .overlay-gradient {
+    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent;
+  }
+
+  /* Badge styles */
+  .badge-new {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
+  }
+
+  .badge-popular {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800;
+  }
+
+  .badge-premium {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium gradient-gold text-white;
+  }
+}
+
+/* ============================================
+   Custom Utilities
+   ============================================ */
+@layer utilities {
+  /* Text balance for better readability */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Safe area insets for mobile */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ============================================
+   Animation Classes
+   ============================================ */
+@layer utilities {
+  /* Entrance animations */
+  .animate-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .animate-in-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  .animate-in-down {
+    animation: slideDown 0.4s ease-out;
+  }
+
+  .animate-in-scale {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-1;
+  }
+
+  /* Hover grow effect */
+  .hover-grow {
+    @apply transition-transform duration-200;
+  }
+
+  .hover-grow:hover {
+    @apply scale-105;
+  }
+
+  /* Image zoom on hover */
+  .image-zoom {
+    @apply overflow-hidden;
+  }
+
+  .image-zoom img {
+    @apply transition-transform duration-700;
+  }
+
+  .image-zoom:hover img {
+    @apply scale-110;
+  }
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.gray.400') theme('colors.gray.100');
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    @apply text-black bg-white;
+  }
 }
