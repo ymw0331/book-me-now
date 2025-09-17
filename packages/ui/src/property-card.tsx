@@ -119,7 +119,8 @@ const PropertyCard = React.forwardRef<HTMLDivElement, PropertyCardProps>(
     }
 
     // Truncate text
-    const truncateText = (text: string, maxLength: number) => {
+    const truncateText = (text: string | undefined, maxLength: number) => {
+      if (!text) return ''
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
     }
 
@@ -252,9 +253,11 @@ const PropertyCard = React.forwardRef<HTMLDivElement, PropertyCardProps>(
             </h3>
 
             {/* Description */}
-            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-              {truncateText(property.content, 100)}
-            </p>
+            {property.content && (
+              <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                {truncateText(property.content, 100)}
+              </p>
+            )}
 
             {/* Property Details */}
             <div className="flex items-center space-x-4 text-sm text-gray-600">

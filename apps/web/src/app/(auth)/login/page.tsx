@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-// Removed framer-motion import - using CSS transitions instead
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import {
   Card,
   CardContent,
@@ -16,41 +18,47 @@ import {
   Container
 } from '@book-me-now/ui'
 import { LogIn, Mail, Lock, Eye, EyeOff, Github, Chrome } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { loginSchema, type LoginFormData } from '@/lib/validations'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const { login, isLoading: authLoading } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+  const watchedEmail = watch('email')
+  const watchedPassword = watch('password')
 
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      // TODO: Implement actual login API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await login({
+        email: data.email,
+        password: data.password,
+      })
 
-      // For demo purposes, simulate success
-      console.log('Login attempt:', formData)
-
-      // Navigate to dashboard after successful login
+      toast.success('Welcome back!')
       router.push('/dashboard')
-    } catch (err) {
-      setError('Invalid email or password. Please try again.')
-    } finally {
-      setIsLoading(false)
+    } catch (error: any) {
+      toast.error(error.message || 'Invalid email or password')
     }
   }
 
   const handleSocialLogin = (provider: string) => {
-    // TODO: Implement social login
-    console.log(`Login with ${provider}`)
+    toast.info(`${provider} login coming soon!`)
   }
 
   return (
@@ -65,13 +73,7 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="error">
-                  {error}
-                </Alert>
-              )}
-
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
                   Email
@@ -82,13 +84,14 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    {...register('email')}
                     className="pl-10"
-                    required
-                    disabled={isLoading}
+                    disabled={isSubmitting || authLoading}
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -109,11 +112,9 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    {...register('password')}
                     className="pl-10 pr-10"
-                    required
-                    disabled={isLoading}
+                    disabled={isSubmitting || authLoading}
                   />
                   <button
                     type="button"
@@ -127,12 +128,16 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+                )}
               </div>
 
               <div className="flex items-center">
                 <input
                   id="remember"
                   type="checkbox"
+                  {...register('rememberMe')}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
@@ -144,71 +149,58 @@ export default function LoginPage() {
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={isLoading || !formData.email || !formData.password}
+                disabled={isSubmitting || authLoading}
               >
-                {isLoading ? (
+                {isSubmitting || authLoading ? (
                   <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span className="animate-spin h-4 w-4 mr-2 border-b-2 border-white rounded-full" />
                     Signing in...
                   </>
                 ) : (
                   <>
-                    <LogIn className="mr-2 h-4 w-4" />
+                    <LogIn className="h-4 w-4 mr-2" />
                     Sign in
                   </>
                 )}
               </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleSocialLogin('google')}
-                  disabled={isLoading}
-                >
-                  <Chrome className="mr-2 h-4 w-4" />
-                  Google
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleSocialLogin('github')}
-                  disabled={isLoading}
-                >
-                  <Github className="mr-2 h-4 w-4" />
-                  GitHub
-                </Button>
-              </div>
-
-              <p className="text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                  Sign up
-                </Link>
-              </p>
             </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant="outline"
+                onClick={() => handleSocialLogin('Google')}
+                disabled={isSubmitting || authLoading}
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Google
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleSocialLogin('GitHub')}
+                disabled={isSubmitting || authLoading}
+              >
+                <Github className="h-4 w-4 mr-2" />
+                GitHub
+              </Button>
+            </div>
+
+            <p className="mt-6 text-center text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                Create an account
+              </Link>
+            </p>
           </CardContent>
         </Card>
-
-        <p className="mt-6 text-center text-xs text-gray-500">
-          By signing in, you agree to our{' '}
-          <Link href="/terms" className="underline hover:text-gray-700">
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link href="/privacy" className="underline hover:text-gray-700">
-            Privacy Policy
-          </Link>
-        </p>
       </div>
     </Container>
   )

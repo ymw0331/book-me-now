@@ -14,7 +14,8 @@ import {
   Settings,
   Heart,
   Search,
-  Globe
+  Globe,
+  MapPin
 } from "lucide-react"
 import { cn } from "@book-me-now/utils"
 import { Button } from "./button"
@@ -122,9 +123,9 @@ const Navigation = React.forwardRef<HTMLElement, NavigationProps>(
 
     // Default navigation items
     const defaultNavItems: NavItem[] = [
-      { href: "/", label: "Home", icon: Home, show: true },
       { href: "/search", label: "Explore", icon: Globe, show: true },
       { href: "/dashboard", label: "Dashboard", icon: User, show: !!user },
+      { href: "/dashboard/trips", label: "My Trips", icon: MapPin, show: !!user },
       { href: "/favorites", label: "Wishlist", icon: Heart, show: !!user },
     ]
 

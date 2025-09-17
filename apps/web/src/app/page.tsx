@@ -1,4 +1,8 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Container,
   Jumbotron,
@@ -6,12 +10,68 @@ import {
   SearchBar,
   Button
 } from '@book-me-now/ui'
-import { Home, Briefcase, Globe, Shield } from 'lucide-react'
+import { Home, Briefcase, Globe, Shield, ArrowRight, Star, MapPin } from 'lucide-react'
+import { useFeaturedProperties } from '@/hooks/useProperties'
+import { usePropertySearch } from '@/hooks/useSearch'
+import { toast } from 'sonner'
 
-export default async function HomePage() {
-  const featuredProperties = await getFeaturedProperties()
-  const stats = await getStats()
-  const categories = await getCategories()
+export default function HomePage() {
+  const router = useRouter()
+  const { data: featuredProperties, isLoading } = useFeaturedProperties()
+  const { search } = usePropertySearch()
+
+  const [searchValue, setSearchValue] = useState({
+    location: '',
+    checkIn: undefined as Date | undefined,
+    checkOut: undefined as Date | undefined,
+    guests: 1,
+    bedrooms: 1
+  })
+
+  const handleSearch = (searchData?: any) => {
+    const dataToSearch = searchData || searchValue
+
+    if (!dataToSearch.location) {
+      toast.error('Please enter a location')
+      return
+    }
+
+    search({
+      location: dataToSearch.location,
+      bed: dataToSearch.bedrooms || 1
+    })
+
+    // Build query params
+    const params = new URLSearchParams({
+      location: dataToSearch.location,
+      bed: String(dataToSearch.bedrooms || 1),
+      guests: String(dataToSearch.guests || 1)
+    })
+
+    if (dataToSearch.checkIn) {
+      params.append('checkIn', dataToSearch.checkIn.toISOString())
+    }
+    if (dataToSearch.checkOut) {
+      params.append('checkOut', dataToSearch.checkOut.toISOString())
+    }
+
+    router.push(`/search?${params.toString()}`)
+  }
+
+  // Mock stats data - in production, this would come from an API
+  const stats = {
+    hotels: 25000,
+    guests: 100000,
+    countries: 120,
+    reviews: 50000
+  }
+
+  const categories = [
+    { name: 'Entire Homes', count: 8500, icon: Home },
+    { name: 'Private Rooms', count: 12000, icon: Briefcase },
+    { name: 'Boutique Hotels', count: 3500, icon: Globe },
+    { name: 'Luxury Resorts', count: 1000, icon: Shield }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -30,11 +90,9 @@ export default async function HomePage() {
           <div className="mt-12 max-w-4xl mx-auto">
             <SearchBar
               variant="expanded"
-              value={{
-                location: '',
-                guests: 1,
-                bedrooms: 1
-              }}
+              value={searchValue}
+              onSearch={handleSearch}
+              onLocationChange={(location) => setSearchValue(prev => ({ ...prev, location }))}
             />
           </div>
         </div>
@@ -48,291 +106,196 @@ export default async function HomePage() {
             <p className="text-gray-600">Hotels Worldwide</p>
           </div>
           <div>
-            <div className="text-3xl font-bold text-blue-600">{stats.cities.toLocaleString()}</div>
-            <p className="text-gray-600">Cities & Destinations</p>
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-blue-600">{stats.bookings.toLocaleString()}</div>
-            <p className="text-gray-600">Happy Customers</p>
+            <div className="text-3xl font-bold text-blue-600">{stats.guests.toLocaleString()}+</div>
+            <p className="text-gray-600">Happy Guests</p>
           </div>
           <div>
             <div className="text-3xl font-bold text-blue-600">{stats.countries}</div>
             <p className="text-gray-600">Countries</p>
           </div>
+          <div>
+            <div className="text-3xl font-bold text-blue-600">{stats.reviews.toLocaleString()}</div>
+            <p className="text-gray-600">Verified Reviews</p>
+          </div>
         </div>
       </Container>
 
-      {/* Category Filters */}
-      <div className="bg-gray-50 py-12">
-        <Container>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Explore by property type</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category) => (
+      {/* Categories Section */}
+      <Container className="py-16 border-t">
+        <h2 className="text-3xl font-bold mb-8 text-center">Explore by Category</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((category) => {
+            const Icon = category.icon
+            return (
               <Link
-                key={category.id}
-                href={`/search?type=${category.slug}`}
-                className="group"
+                key={category.name}
+                href={`/search?type=${encodeURIComponent(category.name.toLowerCase())}`}
+                className="group p-6 bg-white rounded-xl border hover:shadow-lg transition-shadow"
               >
-                <div className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 text-blue-600">
-                    {category.icon}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {category.count} properties
-                  </p>
-                </div>
+                <Icon className="h-8 w-8 text-blue-600 mb-3 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-lg mb-1">{category.name}</h3>
+                <p className="text-gray-500">{category.count.toLocaleString()} properties</p>
               </Link>
+            )
+          })}
+        </div>
+      </Container>
+
+      {/* Featured Properties */}
+      <Container className="py-16 border-t">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold">Featured Properties</h2>
+          <Link href="/search" className="text-blue-600 hover:text-blue-700 flex items-center gap-2">
+            View all <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                <div className="bg-gray-200 h-4 rounded w-3/4 mb-2"></div>
+                <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+              </div>
             ))}
           </div>
-        </Container>
-      </div>
-
-      {/* Featured Properties Section */}
-      <Container className="py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Featured Properties
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Handpicked hotels offering exceptional experiences and unparalleled service
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProperties.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={{
-                _id: property.id,
-                title: property.title,
-                location: property.location,
-                price: property.price,
-                content: `Stunning ${property.title} in ${property.location}`,
-                bed: 2,
-                from: new Date().toISOString().split('T')[0],
-                rating: property.rating,
-                reviewCount: property.reviews,
-                isSuperhostProperty: property.isSuperhost,
-                isFavorited: property.isFavorite,
-                image: { contentType: 'image/jpeg' }
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Button asChild size="lg">
-            <Link href="/properties">
-              Explore All Properties
-            </Link>
-          </Button>
-        </div>
-      </Container>
-
-      {/* Live Anywhere Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16">
-        <Container>
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
-            Live anywhere
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white">
-                <Home className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Entire homes</h3>
-              <p className="text-gray-600">Comfortable private places, with room for friends or family.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white">
-                <Globe className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Unique stays</h3>
-              <p className="text-gray-600">Spaces that are more than just a place to sleep.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center text-white">
-                <Briefcase className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Business travel</h3>
-              <p className="text-gray-600">Work-friendly stays with fast wifi and dedicated workspaces.</p>
-            </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProperties?.slice(0, 4).map((property) => (
+              <PropertyCard
+                key={property._id}
+                property={{
+                  _id: property._id,
+                  title: property.title,
+                  content: property.content,
+                  location: property.location,
+                  price: property.price,
+                  bed: property.bed,
+                  image: property.image || `https://picsum.photos/400/300?random=${property._id}`,
+                  from: property.from,
+                  to: property.to,
+                  postedBy: property.postedBy
+                }}
+                onFavorite={() => toast.info('Favorites coming soon!')}
+              />
+            ))}
+            {/* Fallback properties if none from API */}
+            {(!featuredProperties || featuredProperties.length === 0) && (
+              <>
+                <PropertyCard
+                  property={{
+                    _id: '1',
+                    title: 'Luxury Downtown Loft',
+                    content: 'Experience luxury living in the heart of downtown with stunning city views',
+                    location: 'New York, NY',
+                    price: 299,
+                    bed: 2,
+                    image: 'https://picsum.photos/400/300?random=1',
+                    from: new Date().toISOString(),
+                    to: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    postedBy: { _id: '1', name: 'John Host', email: 'host@example.com' }
+                  }}
+                  onFavorite={() => toast.info('Favorites coming soon!')}
+                />
+                <PropertyCard
+                  property={{
+                    _id: '2',
+                    title: 'Beachfront Villa',
+                    content: 'Wake up to ocean views in this stunning beachfront villa with private access',
+                    location: 'Miami, FL',
+                    price: 450,
+                    bed: 3,
+                    image: 'https://picsum.photos/400/300?random=2',
+                    from: new Date().toISOString(),
+                    to: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    postedBy: { _id: '2', name: 'Jane Host', email: 'host2@example.com' }
+                  }}
+                  onFavorite={() => toast.info('Favorites coming soon!')}
+                />
+                <PropertyCard
+                  property={{
+                    _id: '3',
+                    title: 'Mountain Retreat',
+                    content: 'Escape to the mountains in this luxurious retreat with panoramic views',
+                    location: 'Aspen, CO',
+                    price: 599,
+                    bed: 4,
+                    image: 'https://picsum.photos/400/300?random=3',
+                    from: new Date().toISOString(),
+                    to: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    postedBy: { _id: '3', name: 'Bob Host', email: 'host3@example.com' }
+                  }}
+                  onFavorite={() => toast.info('Favorites coming soon!')}
+                />
+                <PropertyCard
+                  property={{
+                    _id: '4',
+                    title: 'Historic Townhouse',
+                    content: 'Stay in a beautifully restored historic townhouse in the heart of Boston',
+                    location: 'Boston, MA',
+                    price: 225,
+                    bed: 2,
+                    image: 'https://picsum.photos/400/300?random=4',
+                    from: new Date().toISOString(),
+                    to: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    postedBy: { _id: '4', name: 'Alice Host', email: 'host4@example.com' }
+                  }}
+                  onFavorite={() => toast.info('Favorites coming soon!')}
+                />
+              </>
+            )}
           </div>
-        </Container>
-      </div>
+        )}
+      </Container>
 
       {/* Trust Indicators */}
-      <Container className="py-16">
-        <div className="bg-gray-50 rounded-2xl p-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Why book with us?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <Shield className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-              <h3 className="text-lg font-semibold mb-2">Secure Booking</h3>
-              <p className="text-gray-600">Your payment information is encrypted and secure</p>
-            </div>
-            <div className="text-center">
-              <Globe className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-              <h3 className="text-lg font-semibold mb-2">24/7 Support</h3>
-              <p className="text-gray-600">Round-the-clock assistance for all your travel needs</p>
-            </div>
-            <div className="text-center">
-              <Home className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-              <h3 className="text-lg font-semibold mb-2">Verified Properties</h3>
-              <p className="text-gray-600">All properties are verified for quality and authenticity</p>
-            </div>
+      <Container className="py-16 border-t">
+        <h2 className="text-3xl font-bold mb-8 text-center">Why Choose Book Me Now</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Secure Booking</h3>
+            <p className="text-gray-600">Your payments and personal information are always protected with our secure booking system.</p>
+          </div>
+          <div className="text-center">
+            <Star className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Verified Reviews</h3>
+            <p className="text-gray-600">Read genuine reviews from real guests who have stayed at our properties.</p>
+          </div>
+          <div className="text-center">
+            <MapPin className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Best Locations</h3>
+            <p className="text-gray-600">Hand-picked properties in prime locations to ensure the best experience.</p>
           </div>
         </div>
       </Container>
 
-      {/* Newsletter Section */}
-      <div className="bg-blue-600 py-16">
+      {/* Newsletter Signup */}
+      <div className="bg-blue-600 text-white py-16">
         <Container>
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Get exclusive deals
-            </h2>
-            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-              Subscribe to our newsletter and be the first to know about special offers and new properties
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+            <p className="text-blue-100 mb-8">
+              Get exclusive deals and travel inspiration delivered to your inbox.
             </p>
-            <form className="max-w-md mx-auto flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                className="flex-1 px-4 py-3 rounded-lg text-gray-900"
               />
               <Button
-                type="submit"
                 variant="secondary"
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50"
+                onClick={() => toast.success('Newsletter subscription coming soon!')}
               >
                 Subscribe
               </Button>
-            </form>
+            </div>
           </div>
         </Container>
       </div>
     </div>
   )
-}
-
-async function getFeaturedProperties() {
-  await new Promise(resolve => setTimeout(resolve, 100))
-
-  return [
-    {
-      id: '1',
-      title: 'Marina Bay Luxury Hotel',
-      location: 'Singapore',
-      price: 299,
-      rating: 4.8,
-      reviews: 1247,
-      image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: true,
-      isFavorite: false
-    },
-    {
-      id: '2',
-      title: 'Sunset Beach Resort',
-      location: 'Bali, Indonesia',
-      price: 189,
-      rating: 4.6,
-      reviews: 892,
-      image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: false,
-      isFavorite: true
-    },
-    {
-      id: '3',
-      title: 'Mountain View Lodge',
-      location: 'Kyoto, Japan',
-      price: 245,
-      rating: 4.9,
-      reviews: 634,
-      image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: true,
-      isFavorite: false
-    },
-    {
-      id: '4',
-      title: 'Urban Boutique Hotel',
-      location: 'New York, USA',
-      price: 325,
-      rating: 4.7,
-      reviews: 1523,
-      image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: false,
-      isFavorite: false
-    },
-    {
-      id: '5',
-      title: 'Coastal Paradise Villa',
-      location: 'Santorini, Greece',
-      price: 410,
-      rating: 4.9,
-      reviews: 428,
-      image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: true,
-      isFavorite: true
-    },
-    {
-      id: '6',
-      title: 'Desert Oasis Resort',
-      location: 'Dubai, UAE',
-      price: 550,
-      rating: 4.8,
-      reviews: 967,
-      image: 'https://images.unsplash.com/photo-1606046604972-77cc76aee944?ixlib=rb-4.0.3&w=800&q=80',
-      isSuperhost: true,
-      isFavorite: false
-    }
-  ]
-}
-
-async function getStats() {
-  return {
-    hotels: 15420,
-    cities: 1250,
-    bookings: 89430,
-    countries: 94
-  }
-}
-
-async function getCategories() {
-  return [
-    {
-      id: 'entire-home',
-      name: 'Entire homes',
-      slug: 'entire-home',
-      count: 5234,
-      icon: <Home className="w-full h-full" />
-    },
-    {
-      id: 'private-room',
-      name: 'Private rooms',
-      slug: 'private-room',
-      count: 3421,
-      icon: <Briefcase className="w-full h-full" />
-    },
-    {
-      id: 'boutique',
-      name: 'Boutique hotels',
-      slug: 'boutique',
-      count: 2156,
-      icon: <Globe className="w-full h-full" />
-    },
-    {
-      id: 'luxury',
-      name: 'Luxury stays',
-      slug: 'luxury',
-      count: 1893,
-      icon: <Shield className="w-full h-full" />
-    }
-  ]
 }
