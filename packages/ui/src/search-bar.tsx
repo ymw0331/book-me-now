@@ -119,12 +119,28 @@ const SearchBar = React.forwardRef<HTMLDivElement, SearchBarProps>(
     const [isExpanded, setIsExpanded] = React.useState(false)
     const [activeStep, setActiveStep] = React.useState<'location' | 'dates' | 'guests' | null>(null)
     const [searchData, setSearchData] = React.useState<Partial<SearchCriteria>>({
-      location: '',
-      guests: 1,
-      bedrooms: 1,
+      location: value?.location || '',
+      guests: value?.guests || 1,
+      bedrooms: value?.bedrooms || 1,
+      checkIn: value?.checkIn,
+      checkOut: value?.checkOut,
       ...value
     })
     const [showSuggestions, setShowSuggestions] = React.useState(false)
+
+    // Sync value prop with internal state
+    React.useEffect(() => {
+      if (value) {
+        setSearchData(prev => ({
+          ...prev,
+          location: value.location || prev.location,
+          guests: value.guests || prev.guests,
+          bedrooms: value.bedrooms || prev.bedrooms,
+          checkIn: value.checkIn || prev.checkIn,
+          checkOut: value.checkOut || prev.checkOut
+        }))
+      }
+    }, [value])
 
     // Format date for display
     const formatDate = (date: Date | undefined) => {
@@ -273,7 +289,7 @@ const SearchBar = React.forwardRef<HTMLDivElement, SearchBarProps>(
                   setActiveStep('location')
                   setShowSuggestions(searchData.location.length > 0)
                 }}
-                className="w-full text-sm placeholder:text-gray-500 bg-transparent border-0 p-0 focus:outline-none focus:ring-0"
+                className="w-full text-sm text-gray-900 placeholder:text-gray-500 bg-transparent border-0 p-0 focus:outline-none focus:ring-0"
               />
             </div>
 

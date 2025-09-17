@@ -190,6 +190,7 @@ export default function SearchPageContent() {
             variant="compact"
             value={searchCriteria}
             onSearch={handleNewSearch}
+            onLocationChange={(location) => setSearchCriteria(prev => ({ ...prev, location }))}
             showRecentSearches={true}
           />
         </Container>
@@ -234,7 +235,7 @@ export default function SearchPageContent() {
                           placeholder="Min price"
                           value={filters.minPrice}
                           onChange={(e) => handleFilterChange('minPrice', parseInt(e.target.value) || 0)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <span className="text-gray-500">to</span>
                         <input
@@ -242,7 +243,7 @@ export default function SearchPageContent() {
                           placeholder="Max price"
                           value={filters.maxPrice}
                           onChange={(e) => handleFilterChange('maxPrice', parseInt(e.target.value) || 1000)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                     </div>
