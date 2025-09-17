@@ -69,10 +69,10 @@ function getUserIdFromToken(token: string): string | null {
 // GET /api/orders/[id] - Get single order
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
 
@@ -148,10 +148,10 @@ export async function GET(
 // PUT /api/orders/[id] - Update order (limited fields)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
 
@@ -242,10 +242,10 @@ export async function PUT(
 // DELETE /api/orders/[id] - Cancel/delete order
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
 

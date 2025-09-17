@@ -60,10 +60,10 @@ function getUserIdFromToken(token: string): string | null {
 // GET /api/properties/[id] - Get single property
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const property = mockProperties.find(p => p._id === id);
     if (!property) {
@@ -99,10 +99,10 @@ export async function GET(
 // PUT /api/properties/[id] - Update property
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
 
@@ -214,10 +214,10 @@ export async function PUT(
 // DELETE /api/properties/[id] - Delete property
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
 

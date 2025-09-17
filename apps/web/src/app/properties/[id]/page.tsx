@@ -55,11 +55,12 @@ async function getProperty(id: string): Promise<Property | null> {
 }
 
 interface PropertyPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
-  const property = await getProperty(params.id)
+  const { id } = await params
+  const property = await getProperty(id)
 
   if (!property) {
     notFound()
@@ -222,9 +223,10 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   )
 }
 
-export function generateMetadata({ params }: PropertyPageProps) {
+export async function generateMetadata({ params }: PropertyPageProps) {
+  const { id } = await params
   return {
-    title: `Property ${params.id} | Book Me Now`,
+    title: `Property ${id} | Book Me Now`,
     description: 'View property details and book your stay'
   }
 }

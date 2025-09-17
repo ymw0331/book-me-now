@@ -9,7 +9,7 @@ import ImageUpload from '@/components/property/ImageUpload'
 import { toast } from 'sonner'
 
 interface EditPropertyPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 // Mock function - replace with actual API call
@@ -82,6 +82,7 @@ async function updateProperty(id: string, formData: FormData): Promise<Property>
 
 export default function EditPropertyPage({ params }: EditPropertyPageProps) {
   const router = useRouter()
+  const [propertyId, setPropertyId] = useState<string>('')
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -108,11 +109,18 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
   const [images, setImages] = useState<File[]>([])
   const [currentImages, setCurrentImages] = useState<string[]>([])
 
+  // Extract id from params
+  useEffect(() => {
+    params.then(p => setPropertyId(p.id))
+  }, [params])
+
   // Load property data
   useEffect(() => {
+    if (!propertyId) return
+
     async function loadProperty() {
       try {
-        const data = await getProperty(params.id)
+        const data = await getProperty(propertyId)
         if (!data) {
           toast.error('Property not found')
           router.push('/properties')
@@ -145,7 +153,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     }
 
     loadProperty()
-  }, [params.id, router])
+  }, [propertyId, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -168,11 +176,11 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
         submitData.append(`image_${index}`, image)
       })
 
-      const updatedProperty = await updateProperty(params.id, submitData)
+      const updatedProperty = await updateProperty(propertyId, submitData)
       toast.success(`${updatedProperty.title} has been updated successfully`)
 
       // Redirect to property view page
-      router.push(`/properties/${params.id}`)
+      router.push(`/properties/${propertyId}`)
     } catch (error) {
       toast.error('Failed to update property')
       console.error(error)
@@ -230,7 +238,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
             </div>
             <Button
               variant="outline"
-              onClick={() => router.push(`/properties/${params.id}`)}
+              onClick={() => router.push(`/properties/${propertyId}`)}
             >
               Cancel
             </Button>
